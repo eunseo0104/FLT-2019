@@ -1,10 +1,11 @@
 
 public class Token {
 
-    private static final int KEYWORDS = TokenType.Eof.ordinal();
+	//ordinal은 enum의 정의된 순서 값(=enum 상수 값, TokenType에서 따로 상수를 정해주지 않고 열거만 해두었기 때문)을 반환하는 메소드
+    private static final int KEYWORDS = TokenType.Eof.ordinal();	//키워드 갯수 (모든 키워드는 TokenType에서 Eof 앞에 있어야함)
 
-    private static final String[] reserved = new String[KEYWORDS];
-    private static Token[] token = new Token[KEYWORDS];
+    private static final String[] reserved = new String[KEYWORDS];	//String 배열 생성 (size = 키워드 갯수)
+    private static Token[] token = new Token[KEYWORDS];				//Token 배열 생성 (size = 키워드 갯수)
 
     public static final Token eofTok = new Token(TokenType.Eof, "<<EOF>>");
     public static final Token constTok = new Token(TokenType.Const, "const");
@@ -44,17 +45,46 @@ public class Token {
     public static final Token decrementTok = new Token(TokenType.Decrement, "--");
     public static final Token andTok = new Token(TokenType.And, "&&");
     public static final Token orTok = new Token(TokenType.Or, "||");
+    
+    //1. 추가 키워드
+    public static final Token charTok = new Token(TokenType.Char, "char");
+    public static final Token doubleTok = new Token(TokenType.Double, "double");
+    public static final Token forTok = new Token(TokenType.For, "for");
+    public static final Token doTok = new Token(TokenType.Do, "do");
+    public static final Token gotoTok = new Token(TokenType.Goto, "goto");
+    public static final Token switchTok = new Token(TokenType.Switch, "switch");
+    public static final Token caseTok = new Token(TokenType.Case, "case");
+    public static final Token breakTok = new Token(TokenType.Break, "break");
+    public static final Token defaultTok = new Token(TokenType.Default, "default");
+    
+    //2. 추가 연산자
+    public static final Token colonTok = new Token(TokenType.Colon, ":");
+    
+    //3. 추가 인식 리터럴
+    
+    //4. 주석
+    
+    //추가 토큰 속성 값 출력
 
     private TokenType type;
     private String value = "";
 
     private Token (TokenType t, String v) {
-        type = t;
-        value = v;
+        type = t; 	//객체 type 초기화
+        value = v;	//객체 value 초기화
         if (t.compareTo(TokenType.Eof) < 0) {
-            int ti = t.ordinal();
-            reserved[ti] = v;
-            token[ti] = this;
+        	/*	
+        	 * 
+        	 * The compareTo() method returns:
+        	 * negativeinteger, if this enum is less than the defined object. t가 eof보다 작을 때 (키워드일 때)
+        	 * zero, if this enum is equal to the defined object. t가 eof일 때
+        	 * positive integer, if this enum is greater than the defined object. t가 eof보다 클 때
+        	 *
+        	 */
+        	
+            int ti = t.ordinal();	//토큰의 정의된 순서(=enum 상수 값)
+            reserved[ti] = v;		//reserved의 ti번째에 token string 저장 (키워드 string 저장하는 배열)
+            token[ti] = this		//token의 ti번째에 자기 자신 객체 저장 (키워드 token 저장하는 배열)
         }
     }
 
@@ -63,15 +93,15 @@ public class Token {
     public String value( ) { return value; }
 
     public static Token keyword  ( String name ) {
-        char ch = name.charAt(0);
-        if (ch >= 'A' && ch <= 'Z') return mkIdentTok(name);
-        for (int i = 0; i < KEYWORDS; i++)
-           if (name.equals(reserved[i]))  return token[i];
-        return mkIdentTok(name);
-    } // keyword
+        char ch = name.charAt(0);	//name의 첫 글자
+        if (ch >= 'A' && ch <= 'Z') return mkIdentTok(name);	//첫 글자가 A~Z에 해당하면 mkIdentTok 실행후 반환 값 리턴
+        for (int i = 0; i < KEYWORDS; i++)	//A~Z에 해당하지 않으면 name이 keyword인지 확인, keyword이면 해당 토큰 반환
+           if (name.equals(reserved[i]))  return token[i];	//reserved는 keyword의 string 정보가 담긴 배열
+        return mkIdentTok(name); //keyword 아니면 mkIdentTok 실행 후 반환 값 리턴
+    }
 
     public static Token mkIdentTok (String name) {
-        return new Token(TokenType.Identifier, name);
+        return new Token(TokenType.Identifier, name); //인자 값으로 새로운 토큰(Identifier) 생성
     }
 
     public static Token mkIntLiteral (String name) {
